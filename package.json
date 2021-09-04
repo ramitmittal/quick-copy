@@ -1,0 +1,34 @@
+{
+  "name": "quick-copy",
+  "version": "2.0.0",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "dev": "./scripts/dev.sh",
+    "dev:chrome": "NODE_ENV=CHROME npm run dev",
+    "dev:firefox": "NODE_ENV=FIREFOX npm run dev",
+    "build": "node scripts/validate && ./scripts/build.sh",
+    "build:chrome": "NODE_ENV=CHROME npm run build",
+    "build:edge": "NODE_ENV=EDGE npm run build",
+    "build:firefox": "NODE_ENV=FIREFOX npm run build"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.7",
+    "@vue/component-compiler-utils": "^3.2.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^7.6.0",
+    "parcel-bundler": "^1.12.4",
+    "vue-template-compiler": "^2.6.12",
+    "web-ext": "^5.5.0"
+  },
+  "browserslist": [
+    "last 3 chrome versions",
+    "last 3 firefox versions"
+  ],
+  "dependencies": {
+    "vue": "^2.6.12",
+    "vue-hot-reload-api": "^2.3.4",
+    "webextension-polyfill": "^0.6.0"
+  }
+}
