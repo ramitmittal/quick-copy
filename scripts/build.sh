@@ -16,11 +16,6 @@ parcel build src/browser_action/index.html src/content_scripts/main.js src/backg
 
 web-ext lint -s dist/
 
-linterReturnCode=$?
-if [ $linterReturnCode -ne 0 ]; then
-  exit $retVal
-fi
-
 cd dist
 zip -r ../artifacts/$npm_package_name-$npm_package_version-$NODE_ENV.zip .
 
