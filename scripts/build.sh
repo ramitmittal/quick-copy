@@ -12,7 +12,7 @@ else
   cp src/manifest.json dist/manifest.json
 fi
 
-parcel build src/browser_action/index.html src/content_scripts/main.js src/background/index.html --out-dir dist/  --no-source-maps 
+parcel build src/browser_action/index.html src/content_scripts/main.js src/background/index.html --dist-dir dist/  --no-source-maps
 
 web-ext lint -s dist/
 
