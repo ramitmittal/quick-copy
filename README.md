@@ -14,6 +14,6 @@ Install on [Chrome](https://chrome.google.com/webstore/detail/quick-copy-most-po
 
 ## Meta
 * Distributed under GNU GPLv3. See **LICENSE** for more information.
-* The icon for Sorted is provided by [Unicons](https://iconscout.com/unicons).
+* The icon for Quick Copy is provided by [Unicons](https://iconscout.com/unicons).
 * Contributions and suggestions are welcome. Please consider opening an issue or submitting a pull request.
 * Author: Ramit Mittal - [website](https://www.ramitmittal.com)
