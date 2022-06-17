@@ -12,7 +12,7 @@ else
   cp src/manifest.json dist/manifest.json
 fi
 
-parcel watch src/browser_action/index.html src/content_scripts/main.js src/background/index.html --out-dir dist/ &
+parcel watch src/browser_action/index.html src/content_scripts/main.js src/background/index.html --dist-dir dist/ &
 parcelProcess=$!
 
 sleep 3
