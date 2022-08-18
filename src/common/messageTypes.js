@@ -2,7 +2,7 @@
  * enum for operation identificaton in messages sent between content script, browser action and background script
  */
 
-const messageTypes = {
+const messageTypes = Object.freeze({
   // for content script
   COPY_FROM_PAGE: 1,
   PASTE_TO_PAGE: 2,
@@ -14,6 +14,6 @@ const messageTypes = {
   EDIT_FROM_POPUP: 7,
   COPY_FROM_POPUP: 8,
   MAKE_QUICK: 9,
-};
+});
 
 export default messageTypes;
