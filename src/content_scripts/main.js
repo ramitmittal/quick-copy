@@ -14,11 +14,14 @@ import browser from "webextension-polyfill";
 
 import messageTypes from "../common/messageTypes";
 
-// handle messages sent by background script
+/**
+ * Handler for messages sent by background script
+ * @param {{ op: number, text: string }} request
+ * @returns {string|undefined} the selected text from screen
+ */
 async function handleMessage(request) {
   const { op, text } = request;
 
-  /* return value of this handler is sent back to the sender of the message */
   if (op === messageTypes.COPY_FROM_PAGE) {
     const activeElement = document.activeElement;
     const activeElemTagName = activeElement
@@ -28,10 +31,9 @@ async function handleMessage(request) {
       const startPos = activeElement.selectionStart;
       const endPos = activeElement.selectionEnd;
 
-      if (startPos === endPos) {
-        return activeElement.value;
-      }
-      return activeElement.value.substring(startPos, endPos);
+      return startPos === endPos
+        ? activeElement.value
+        : activeElement.value.substring(startPos, endPos);
     }
     return window.getSelection().toString();
   }
@@ -58,4 +60,5 @@ async function handleMessage(request) {
   }
 }
 
+/* return value of this handler is sent back to the sender of the message */
 browser.runtime.onMessage.addListener(handleMessage);
