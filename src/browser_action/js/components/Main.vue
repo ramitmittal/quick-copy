@@ -2,26 +2,31 @@
   <div>
     <div class="tabset">
       <div
-        v-for="(value, name) in tabItems"
-        :key="name"
-        :class="[
-          name === selectedComponent ? 'selected-tab' : 'unselected-tab',
-          'tab',
-        ]"
-        @click="onTabSelected(name)"
+        :class="[showListing ? 'selected-tab' : 'unselected-tab', 'tab']"
+        @click="toggleListing(true)"
       >
-        <p>{{ value }}</p>
+        <p>Quick Copy</p>
+      </div>
+      <div
+        :class="[!showListing ? 'selected-tab' : 'unselected-tab', 'tab']"
+        @click="toggleListing(false)"
+      >
+        <p>Add New</p>
       </div>
     </div>
-    <component
-      :is="selectedComponent"
+    <quick-copy
+      v-if="showListing"
       :copy-fields="copyFields"
-      :edit-field-data="editFieldId ? copyFields[editFieldId] : null"
-      :edit-field-id="editFieldId"
       @edit-field="handleEditField"
       @delete-field="handleDeleteField"
-      @save-validated="handleSaveNewItem"
       @make-quick="handleMakeQuick"
+    />
+    <add-new
+      v-if="!showListing"
+      @save-validated="handleSaveItem"
+      :label="copyFields[editFieldId]?.label"
+      :text="copyFields[editFieldId]?.text"
+      :fieldId="editFieldId"
     />
   </div>
 </template>
@@ -41,58 +46,52 @@ export default {
   props: {},
   data() {
     return {
-      tabItems: {
-        "quick-copy": "Quick Copy",
-        "add-new": "Add New",
-      },
-      selectedComponent: "quick-copy",
+      showListing: true,
       copyFields: {},
-      editFieldId: null,
+      editFieldId: "",
     };
   },
   mounted() {
-    browser.runtime
-      .sendMessage({ op: messageTypes.REQUEST_CURRENT_COPYFIELDS })
-      .then((response) => {
-        this.copyFields = response.payload;
-      });
-
-    browser.runtime.onMessage.addListener(this.handleMessage);
+    this.refreshData();
   },
   methods: {
-    onTabSelected: function (componentName) {
-      this.selectedComponent = componentName;
+    toggleListing: function (boolVal) {
+      this.showListing = boolVal;
     },
-    // handler for "save" button on add-new component
-    // called on both editing of existing field or addition of new field
-    handleSaveNewItem: function (payloadFromComponent) {
+    handleSaveItem: function (payloadFromComponent) {
       const payloadForMessage = {
         op: messageTypes.EDIT_FROM_POPUP,
         ...payloadFromComponent,
       };
       browser.runtime.sendMessage(payloadForMessage).then(() => {
-        this.selectedComponent = "quick-copy";
+        this.editFieldId = null;
+        this.toggleListing(true);
+        this.refreshData();
       });
-      this.editFieldId = null;
     },
-    handleMessage(message) {
-      const { op, payload } = message;
-      if (op === messageTypes.RESPONSE_CURRENT_COPYFIELDS) {
-        this.copyFields = payload;
-      }
-    },
-    handleDeleteField(fieldId) {
-      browser.runtime.sendMessage({
-        op: messageTypes.DELETE_FROM_POPUP,
-        fieldId,
-      });
+    refreshData() {
+      return browser.runtime
+        .sendMessage({ op: messageTypes.REQUEST_CURRENT_COPYFIELDS })
+        .then((response) => {
+          this.copyFields = response.payload;
+        });
     },
     handleEditField(fieldId) {
       this.editFieldId = fieldId;
-      this.selectedComponent = "add-new";
+      this.toggleListing(false);
+    },
+    handleDeleteField(fieldId) {
+      return browser.runtime
+        .sendMessage({
+          op: messageTypes.DELETE_FROM_POPUP,
+          fieldId,
+        })
+        .then(this.refreshData);
     },
     handleMakeQuick(fieldId) {
-      browser.runtime.sendMessage({ op: messageTypes.MAKE_QUICK, fieldId });
+      browser.runtime
+        .sendMessage({ op: messageTypes.MAKE_QUICK, fieldId })
+        .then(this.refreshData);
     },
   },
 };

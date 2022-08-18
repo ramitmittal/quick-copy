@@ -1,15 +1,3 @@
-/**
- * content scripts run in the context of a webpage
- *   separate instances are executed in each tab
- *
- * content scripts can
- *   access DOM of web page
- *   access some webextension apis
- *
- * this content script will handle messages sent by the background script
- *   and perform actions when user executes a command (shortcut keys)
- */
-
 import browser from "webextension-polyfill";
 
 import messageTypes from "../common/messageTypes";
@@ -20,43 +8,62 @@ import messageTypes from "../common/messageTypes";
  * @returns {string|undefined} the selected text from screen
  */
 async function handleMessage(request) {
-  const { op, text } = request;
-
-  if (op === messageTypes.COPY_FROM_PAGE) {
+  /**
+   * Returns the active DOM element if it is input or textarea
+   * @returns {Element|undefined} DOM element
+   */
+  function getActiveElement() {
     const activeElement = document.activeElement;
     const activeElemTagName = activeElement
       ? activeElement.tagName.toLowerCase()
-      : null;
-    if (activeElemTagName === "textarea" || activeElemTagName === "input") {
-      const startPos = activeElement.selectionStart;
-      const endPos = activeElement.selectionEnd;
-
-      return startPos === endPos
-        ? activeElement.value
-        : activeElement.value.substring(startPos, endPos);
-    }
-    return window.getSelection().toString();
+      : "";
+    return activeElemTagName === "textarea" || activeElemTagName === "input"
+      ? activeElement
+      : undefined;
   }
 
-  if (op === messageTypes.PASTE_TO_PAGE) {
-    const activeElement = document.activeElement;
-    const activeElemTagName = activeElement
-      ? activeElement.tagName.toLowerCase()
-      : null;
-    if (activeElemTagName === "textarea" || activeElemTagName === "input") {
-      const startPos = activeElement.selectionStart;
-      const endPos = activeElement.selectionEnd;
+  /**
+   * Select text from active element in DOM
+   * @returns {String}
+   */
+  function copy() {
+    const ae = getActiveElement();
+    if (ae === undefined) return window.getSelection().toString();
 
-      const effectiveText =
-        activeElement.value.substring(0, startPos) +
-        text +
-        activeElement.value.substring(endPos);
+    const startPos = ae.selectionStart;
+    const endPos = ae.selectionEnd;
+    return startPos === endPos
+      ? ae.value
+      : ae.value.substring(startPos, endPos);
+  }
 
-      activeElement.value = effectiveText;
+  /**
+   * Paste text to active element in DOM
+   * @param {String} text
+   * @returns {undefined}
+   */
+  function paste(text) {
+    const ae = getActiveElement();
+    if (ae === undefined) return;
 
-      const event = new Event("change", { bubbles: true });
-      activeElement.dispatchEvent(event);
-    }
+    // TODO: reset selection after paste?
+    const startPos = ae.selectionStart;
+    const endPos = ae.selectionEnd;
+
+    const effectiveText =
+      ae.value.substring(0, startPos) + text + ae.value.substring(endPos);
+
+    ae.value = effectiveText;
+
+    const event = new Event("change", { bubbles: true });
+    ae.dispatchEvent(event);
+  }
+
+  const { op, text } = request;
+  if (op === messageTypes.COPY_FROM_PAGE) {
+    return copy();
+  } else if (op === messageTypes.PASTE_TO_PAGE) {
+    return paste(text);
   }
 }
 

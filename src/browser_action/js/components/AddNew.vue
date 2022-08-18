@@ -2,9 +2,9 @@
   <div>
     <form @submit.prevent="onSubmit">
       <label for="label">Description</label>
-      <input v-model.trim="label" type="text" class="moz-bg-white" /><br />
+      <input v-model.trim="name" type="text" class="moz-bg-white" /><br />
       <label for="text">Content</label>
-      <textarea v-model="text" type="text" class="moz-bg-white" rows="2" />
+      <textarea v-model="value" type="text" class="moz-bg-white" rows="2" />
       <button type="submit">Save</button>
     </form>
   </div>
@@ -12,39 +12,43 @@
 
 <script>
 export default {
-  // used for editing existing name: value
   props: {
-    editFieldData: {
+    label: {
       required: false,
+      type: String,
+      default: "",
     },
-    editFieldId: {
+    text: {
       required: false,
+      type: String,
+      default: "",
+    },
+    fieldId: {
+      required: false,
+      type: String,
+      default: "",
     },
   },
-  // set components's data to values from props
   data() {
     return {
-      label: this.editFieldData ? this.editFieldData.label : "",
-      text: this.editFieldData ? this.editFieldData.text : "",
+      name: this.label,
+      value: this.text,
     };
   },
-  // if props aren't provided, attempt to read from clipboard
   mounted() {
-    if (!this.editFieldData || this.editFieldData.text === "") {
+    if (this.dLabel === "") {
       document.getElementsByTagName("textarea")[0].focus();
       document.execCommand("paste");
-      document.getElementsByTagName("input")[0].focus();
-    } else {
-      document.getElementsByTagName("input")[0].focus();
     }
+    document.getElementsByTagName("input")[0].focus();
   },
   methods: {
     onSubmit() {
-      if (this.text.length > 0 && this.label.length > 0) {
+      if (this.name.length > 0 && this.value.length > 0) {
         this.$emit("save-validated", {
-          text: this.text,
-          label: this.label,
-          fieldId: this.editFieldId,
+          label: this.name,
+          text: this.value,
+          fieldId: this.fieldId,
         });
       }
     },

@@ -12,7 +12,6 @@ const messageTypes = Object.freeze({
   RESPONSE_CURRENT_COPYFIELDS: 5,
   DELETE_FROM_POPUP: 6,
   EDIT_FROM_POPUP: 7,
-  COPY_FROM_POPUP: 8,
   MAKE_QUICK: 9,
 });
 

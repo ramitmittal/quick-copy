@@ -6,7 +6,7 @@
     </p>
     <div v-else>
       <transition name="slide-fade">
-        <div v-if="showToaster" class="toaster">Copied!</div>
+        <div v-if="toasterText.length > 0" class="toaster">Copied!</div>
       </transition>
       <div class="search">
         <img class="inside-icon" src="../../static/search.svg" />
@@ -66,19 +66,18 @@
 </template>
 
 <script>
-import browser from "webextension-polyfill";
-
 export default {
   props: {
     copyFields: {
       type: Object,
       required: true,
+      default: () => ({}),
     },
   },
   data() {
     return {
       searchTerm: "",
-      showToaster: false,
+      toasterText: "",
     };
   },
   computed: {
@@ -86,6 +85,7 @@ export default {
       return Object.keys(this.copyFields).length === 0;
     },
     filteredCopyFields() {
+      // TODO: what is this?
       const searchTerm = this.searchTerm;
       const copyFields = this.copyFields;
 
@@ -120,17 +120,15 @@ export default {
       if (value.length > 200) return `${value.substring(0, 200)}...`;
       return value;
     },
-    openLink(url) {
-      browser.tabs.create({ url });
-    },
-    openWebStore() {
-      browser.tabs.create({ url: process.env.STORE_URL });
-    },
-    executeCopy(value) {
-      navigator.clipboard.writeText(value);
-      this.showToaster = true;
+    async executeCopy(value) {
+      try {
+        await navigator.clipboard.writeText(value);
+        this.toasterText = "Copied!";
+      } catch (err) {
+        this.toasterText = "Failed!";
+      }
       setTimeout(() => {
-        this.showToaster = false;
+        this.toasterText = "";
       }, 1500);
     },
     quickSlotText(n) {
