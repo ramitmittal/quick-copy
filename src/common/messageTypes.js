@@ -13,7 +13,7 @@ const messageTypes = {
   DELETE_FROM_POPUP: 6,
   EDIT_FROM_POPUP: 7,
   COPY_FROM_POPUP: 8,
-  MAKE_QUICK: 9
-}
+  MAKE_QUICK: 9,
+};
 
-export default messageTypes
+export default messageTypes;

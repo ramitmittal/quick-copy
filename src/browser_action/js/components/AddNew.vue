@@ -65,7 +65,7 @@ textarea {
   width: 100%;
 }
 textarea {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
 }
 button {
   color: #ffffff;
