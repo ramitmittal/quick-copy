@@ -95,6 +95,7 @@ export default {
         if (aqsn !== undefined && bqsn === undefined) return -1;
         if (bqsn !== undefined && aqsn === undefined) return 1;
         if (aqsn !== undefined && bqsn !== undefined) return aqsn - bqsn;
+        return a.createdAt - b.createdAt;
       }
 
       function reduceWithoutFilter(acc, [curKey, curVal]) {

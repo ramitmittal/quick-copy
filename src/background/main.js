@@ -187,7 +187,9 @@ async function handleMessage(msg) {
   function upsert(fieldId, label, text) {
     const effectiveFieldId = fieldId || Math.random().toString().substring(2);
     if (copyFields[effectiveFieldId] === undefined)
-      copyFields[effectiveFieldId] = {};
+      copyFields[effectiveFieldId] = {
+        createdAt: new Date().valueOf(),
+      };
     copyFields[effectiveFieldId].label = label;
     copyFields[effectiveFieldId].text = text;
     // TODO: add order
