@@ -1,5 +1,5 @@
 # Quick Copy
-A webextension that makes copying text easier inside browsers.
+A webextension that makes copying text inside browsers easier with 2000+ active users on Chrome Web Store.
 
 ## Usage
 Install on [Chrome](https://chrome.google.com/webstore/detail/quick-copy-most-powerful/koedeplaimlocjhkpcjnfpfpmmaheacf) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/quickcopy/)
