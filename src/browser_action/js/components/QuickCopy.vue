@@ -93,7 +93,7 @@ export default {
         const aqsn = a.quickSlotNumber;
         const bqsn = b.quickSlotNumber;
         if (aqsn !== undefined && bqsn === undefined) return -1;
-        if (bqsn !== undefined && aqsn === undefined) return 1;
+        if (aqsn === undefined && bqsn !== undefined) return 1;
         if (aqsn !== undefined && bqsn !== undefined) return aqsn - bqsn;
         return a.createdAt - b.createdAt;
       }
