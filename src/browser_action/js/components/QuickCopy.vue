@@ -35,6 +35,7 @@
               :title="quickSlotText(value.quickSlotNumber)"
               class="icon"
               src="../../static/star.svg"
+              @click="$emit('make-quick', value.fieldId)"
             />
             <span v-if="value.quickSlotNumber" class="number-display">
               {{ value.quickSlotNumber }}
@@ -133,7 +134,7 @@ export default {
       }, 1500);
     },
     quickSlotText(n) {
-      return `Quick Slot ${n}`;
+      return `Quick Slot ${n}.\nClick to remove from Quick Slot.`;
     },
   },
 };

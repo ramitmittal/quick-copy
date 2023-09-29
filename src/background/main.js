@@ -197,29 +197,32 @@ async function handleMessage(msg) {
   }
 
   /**
-   * Convert an ordinary copyField into a quick slot
+   * Convert an ordinary copyField into a quick slot (or reverse)
    * @param {string} fieldId id of copyField
    * @returns {Promise<undefined>}
    */
   function makeQuick(fieldId) {
-    if (copyFields[fieldId].quickSlotNumber !== undefined) return;
-
-    const usedQuickSlots = new Set();
-    Object.values(copyFields).forEach((val) => {
-      if (val.quickSlotNumber !== undefined) {
-        usedQuickSlots.add(val.quickSlotNumber);
+    if (copyFields[fieldId].quickSlotNumber !== undefined) {
+      // remove field from quick slots
+      delete copyFields[fieldId].quickSlotNumber;
+    } else {
+      // add field to quick slots
+      const usedQuickSlots = new Set();
+      Object.values(copyFields).forEach((val) => {
+        if (val.quickSlotNumber !== undefined) {
+          usedQuickSlots.add(val.quickSlotNumber);
+        }
+      });
+      const nextAvailableQuickSlotNumber = [5, 4, 3, 2, 1].reduce(
+        (acc, curVal) => {
+          if (usedQuickSlots.has(curVal)) return acc;
+          else return curVal;
+        },
+        undefined
+      );
+      if (nextAvailableQuickSlotNumber !== undefined) {
+        copyFields[fieldId].quickSlotNumber = nextAvailableQuickSlotNumber;
       }
-    });
-    const nextAvailableQuickSlotNumber = [5, 4, 3, 2, 1].reduce(
-      (acc, curVal) => {
-        if (usedQuickSlots.has(curVal)) return acc;
-        else return curVal;
-      },
-      undefined
-    );
-
-    if (nextAvailableQuickSlotNumber !== undefined) {
-      copyFields[fieldId].quickSlotNumber = nextAvailableQuickSlotNumber;
     }
     return updateStorage();
   }
