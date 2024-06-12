@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Quick Copy - most powerful clipboard manager",
   "description": "A superpowered clipboard inside your browser.",
   "version": "2.3.0",
@@ -19,13 +19,14 @@
       "js": ["content_scripts/main.js"]
     }
   ],
-  "browser_action": {
+  "action": {
     "browser_style": true,
     "default_title": "Quick Copy",
     "default_popup": "browser_action/index.html"
   },
   "background": {
-    "page": "background/index.html"
+    "service_worker": "background/main.js",
+    "type": "module"
   },
   "commands": {
     "copy-1": {

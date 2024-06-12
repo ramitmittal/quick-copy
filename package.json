@@ -6,11 +6,8 @@
   "scripts": {
     "dev": "./scripts/dev.sh",
     "dev:chrome": "NODE_ENV=CHROME npm run dev",
-    "dev:firefox": "NODE_ENV=FIREFOX npm run dev",
     "build": "node scripts/validate && ./scripts/build.sh",
-    "build:chrome": "NODE_ENV=CHROME npm run build",
-    "build:edge": "NODE_ENV=EDGE npm run build",
-    "build:firefox": "NODE_ENV=FIREFOX npm run build"
+    "build:chrome": "NODE_ENV=CHROME npm run build"
   },
   "devDependencies": {
     "@parcel/transformer-vue": "^2.4.1",

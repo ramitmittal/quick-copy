@@ -63,14 +63,14 @@ async function handleCommand(cmd) {
   async function showBadgeForTab(text) {
     try {
       const activeTab = await getActiveTab();
-      await browser.browserAction.setBadgeText({ text, tabId: activeTab.id });
-      await browser.browserAction.setBadgeBackgroundColor({
+      await browser.action.setBadgeText({ text, tabId: activeTab.id });
+      await browser.action.setBadgeBackgroundColor({
         color: "#EA6A00",
         tabId,
       });
 
       setTimeout(() => {
-        browser.browserAction
+        browser.action
           .setBadgeText({ text: "", tabId: activeTab.id })
           .catch(() => {});
       }, 2000);
@@ -81,7 +81,7 @@ async function handleCommand(cmd) {
 
   /**
    * Copy text from DOM into quick slot
-   * @returns {Promise<string>}
+   * @returns {Promise<string>} badge text to show on browser action
    */
   async function copy() {
     const activeTab = await getActiveTab();
@@ -113,7 +113,7 @@ async function handleCommand(cmd) {
 
   /**
    * Paste text from quick slot to DOM
-   * @returns {Promise<undefined>}
+   * @returns {Promise<String>} badge text to show on browser action
    */
   async function paste() {
     const quickSlotNumber = Number(cmd.split("-")[1]);
@@ -152,7 +152,7 @@ async function handleCommand(cmd) {
     ? paste()
     : Promise.reject(new Error("unknown command"));
 
-  const badgeText = await p.catch(() => "!!!");
+  const badgeText = await p.catch((err) => {throw err});
   showBadgeForTab(badgeText);
 }
 
