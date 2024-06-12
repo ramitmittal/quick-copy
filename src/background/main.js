@@ -137,6 +137,10 @@ async function handleCommand(cmd) {
     commands.COPY_3,
     commands.COPY_4,
     commands.COPY_5,
+    commands.COPY_6,
+    commands.COPY_7,
+    commands.COPY_8,
+    commands.COPY_9,
   ];
   const pasteComamnds = [
     commands.PASTE_1,
@@ -144,6 +148,10 @@ async function handleCommand(cmd) {
     commands.PASTE_3,
     commands.PASTE_4,
     commands.PASTE_5,
+    commands.PASTE_6,
+    commands.PASTE_7,
+    commands.PASTE_8,
+    commands.PASTE_9,
   ];
 
   const p = copyCommands.includes(cmd)

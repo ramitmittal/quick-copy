@@ -50,6 +50,18 @@
     "copy-5": {
       "description": "Copy text into slot 5"
     },
+    "copy-6": {
+      "description": "Copy text into slot 6"
+    },
+    "copy-7": {
+      "description": "Copy text into slot 7"
+    },
+    "copy-8": {
+      "description": "Copy text into slot 8"
+    },
+    "copy-9": {
+      "description": "Copy text into slot 9"
+    },
     "paste-1": {
       "suggested_key": {
         "default": "Ctrl+Shift+1"
@@ -70,6 +82,18 @@
     },
     "paste-5": {
       "description": "Paste text from slot 5"
+    },
+    "paste-6": {
+      "description": "Paste text from slot 6"
+    },
+    "paste-7": {
+      "description": "Paste text from slot 7"
+    },
+    "paste-8": {
+      "description": "Paste text from slot 8"
+    },
+    "paste-9": {
+      "description": "Paste text from slot 9"
     }
   }
 }
