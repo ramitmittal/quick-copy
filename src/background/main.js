@@ -47,7 +47,7 @@ async function handleCommand(cmd) {
   async function getActiveTab() {
     // ideally an array of length 1
     const allActiveTabs = await browser.tabs.query({
-      currentWindow: true,
+      lastFocusedWindow: true,
       active: true,
     });
 
