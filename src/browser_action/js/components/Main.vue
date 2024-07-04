@@ -18,6 +18,7 @@
       v-if="showListing"
       :copy-fields="copyFields"
       @edit-field="handleEditField"
+      @update-copy-fields="updateCopyFields"
       @delete-field="handleDeleteField"
       @make-quick="handleMakeQuick"
     />
@@ -85,6 +86,14 @@ export default {
         .sendMessage({
           op: messageTypes.DELETE_FROM_POPUP,
           fieldId,
+        })
+        .then(this.refreshData);
+    },
+    updateCopyFields(updatedCopyFields) {
+      return browser.runtime
+        .sendMessage({
+          op: messageTypes.DRAG_SORT,
+          updatedCopyFields,
         })
         .then(this.refreshData);
     },

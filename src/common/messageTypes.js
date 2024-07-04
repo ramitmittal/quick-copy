@@ -13,6 +13,7 @@ const messageTypes = Object.freeze({
   DELETE_FROM_POPUP: 6,
   EDIT_FROM_POPUP: 7,
   MAKE_QUICK: 9,
+  DRAG_SORT:10,
 });
 
 export default messageTypes;

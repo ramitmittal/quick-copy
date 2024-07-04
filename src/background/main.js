@@ -246,6 +246,8 @@ async function handleMessage(msg) {
     p = getAll();
   } else if (op === messageTypes.MAKE_QUICK) {
     p = makeQuick(fieldId);
+  } else if (op === messageTypes.DRAG_SORT) {
+    p = dragSort(dragData);
   } else {
     p = Promise.reject(new Error("unknown message"));
   }

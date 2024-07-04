@@ -16,11 +16,15 @@
           class="moz-bg-white"
         />
       </div>
-      <transition-group class="hide-scroll" name="list" tag="p">
+      <div class="hide-scroll">
         <div
-          v-for="value in filteredCopyFields"
+          v-for="(value, index) in reorderedCopyFields"
           :key="value.fieldId"
           class="flex-row"
+          draggable="true"
+          @dragstart="onDragStart($event, index)"
+          @dragover="onDragOver($event)"
+          @drop="onDrop($event, index)"
         >
           <p
             class="caption-30"
@@ -61,7 +65,7 @@
             />
           </div>
         </div>
-      </transition-group>
+      </div>
     </div>
   </div>
 </template>
@@ -79,6 +83,8 @@ export default {
     return {
       searchTerm: "",
       toasterText: "",
+      draggedIndex: null,
+      reorderedCopyFields: [],
     };
   },
   computed: {
@@ -86,41 +92,47 @@ export default {
       return Object.keys(this.copyFields).length === 0;
     },
     filteredCopyFields() {
-      // TODO: what is this?
-      const searchTerm = this.searchTerm;
-      const copyFields = this.copyFields;
+      const searchTerm = this.searchTerm.toLowerCase();
+      const copyFields = Object.entries(this.copyFields).map(([key, value]) => ({
+        ...value,
+        fieldId: key,
+      }));
 
-      function sortQuickSlotsFirst(a, b) {
+      const sortQuickSlotsFirst = (a, b) => {
         const aqsn = a.quickSlotNumber;
         const bqsn = b.quickSlotNumber;
         if (aqsn !== undefined && bqsn === undefined) return -1;
         if (aqsn === undefined && bqsn !== undefined) return 1;
         if (aqsn !== undefined && bqsn !== undefined) return aqsn - bqsn;
         return a.createdAt - b.createdAt;
-      }
+      };
 
-      function reduceWithoutFilter(acc, [curKey, curVal]) {
-        acc.push({ ...curVal, fieldId: curKey });
-        return acc;
-      }
-
-      function reduceWithFilter(acc, [curKey, curVal]) {
-        if (curVal.label.toLowerCase().includes(searchTerm.toLowerCase())) {
-          acc.push({ ...curVal, fieldId: curKey });
-        }
-        return acc;
-      }
-
-      const entries = Object.entries(copyFields);
       return searchTerm === ""
-        ? entries.reduce(reduceWithoutFilter, []).sort(sortQuickSlotsFirst)
-        : entries.reduce(reduceWithFilter, []).sort(sortQuickSlotsFirst);
+        ? copyFields.sort(sortQuickSlotsFirst)
+        : copyFields
+            .filter((field) =>
+              field.label.toLowerCase().includes(searchTerm)
+            )
+            .sort(sortQuickSlotsFirst);
+    },
+  },
+  watch: {
+    filteredCopyFields: {
+      immediate: true,
+      handler(newFilteredCopyFields) {
+        this.reorderedCopyFields = newFilteredCopyFields;
+      },
+    },
+    copyFields: {
+      immediate: true,
+      handler() {
+        this.reorderedCopyFields = this.filteredCopyFields;
+      },
     },
   },
   methods: {
     makeString(value) {
-      if (value.length > 200) return `${value.substring(0, 200)}...`;
-      return value;
+      return value.length > 200 ? `${value.substring(0, 200)}...` : value;
     },
     async executeCopy(value) {
       try {
@@ -135,6 +147,35 @@ export default {
     },
     quickSlotText(n) {
       return `Quick Slot ${n}.\nClick to remove from Quick Slot.`;
+    },
+    onDragStart(event, index) {
+      this.draggedIndex = index;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/html', event.target.outerHTML);
+    },
+    onDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    },
+    onDrop(event, index) {
+      event.preventDefault();
+      if (this.draggedIndex !== null && this.draggedIndex !== index) {
+        const reorderedCopyFields = [...this.reorderedCopyFields];
+        const draggedItem = reorderedCopyFields[this.draggedIndex];
+        reorderedCopyFields.splice(this.draggedIndex, 1);
+        reorderedCopyFields.splice(index, 0, draggedItem);
+        this.reorderedCopyFields = reorderedCopyFields;
+        this.updateCopyFields();
+        this.draggedIndex = null;
+      }
+    },
+    updateCopyFields() {
+      const updatedCopyFields = this.reorderedCopyFields.reduce((acc, field) => {
+        acc[field.fieldId] = { ...field };
+        delete acc[field.fieldId].fieldId;
+        return acc;
+      }, {});
+      this.$emit('update-copy-fields', updatedCopyFields);
     },
   },
 };
