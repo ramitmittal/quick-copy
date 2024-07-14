@@ -12,9 +12,10 @@
   "devDependencies": {
     "@parcel/transformer-vue": "^2.4.1",
     "parcel": "^2.4.1",
+    "prettier": "3.3.3",
     "vue": "^3.2.32",
-    "webextension-polyfill": "^0.9.0",
-    "web-ext": "^7.6.0"
+    "web-ext": "^7.6.0",
+    "webextension-polyfill": "^0.9.0"
   },
   "browserslist": "> 0.5%, last 2 versions, Firefox ESR, not dead"
 }
