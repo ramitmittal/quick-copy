@@ -4,7 +4,7 @@ import commands from "../common/commands";
 import messageTypes from "../common/messageTypes";
 
 /**
- * @type Record<string, {label: string, text: string, order: number, quickSlotNumber: number|undefined}>
+ * @type Record<string, {label: string, text: string, createdAt: number, quickSlotNumber: number|undefined}>
  */
 let copyFields = {};
 
@@ -14,13 +14,31 @@ let copyFields = {};
  * @returns {Promise<undefined>}
  */
 async function loadData() {
+  /**
+   * Sort all fields on createdAt
+   * Set index in array as value of createdAt
+   */
+  function migrateV3(extData) {
+    return Object.entries(extData.copyFields)
+      .map(([fieldId, data]) => ({
+        ...data,
+        fieldId,
+      }))
+      .sort((a, b) => a.createdAt - b.createdAt)
+      .map((x, idx) => ({ ...x, createdAt: idx }))
+      .reduce((acc, curVal) => {
+        acc[curVal.fieldId] = curVal;
+        delete curVal["fieldId"];
+        return acc;
+      }, {});
+  }
+
   const { extData } = await browser.storage.sync.get();
-  if (extData && extData.version === 3) {
+
+  if (extData && extData.version == 4) {
     copyFields = extData.copyFields;
-  } else if (extData && extData.version === 2) {
-    Object.entries(extData.copyFields).forEach((entry, index) => {
-      copyFields[entry[0]] = { ...entry[1], order: index };
-    });
+  } else if (extData && extData.version === 3) {
+    copyFields = migrateV3(extData);
   }
 }
 
@@ -31,7 +49,16 @@ loadData();
  * @returns {Promise<undefined>}
  */
 function updateStorage() {
-  return browser.storage.sync.set({ extData: { version: 3, copyFields } });
+  return browser.storage.sync.set({ extData: { version: 4, copyFields } });
+}
+
+/**
+ * Get a value higher than all current createdAt values
+ * @returns {number}
+ */
+function nextCreatedAt() {
+  // TODO: test
+  return Math.max(...Object.values(copyFields).map((x) => x.createdAt)) + 1;
 }
 
 /**
@@ -90,9 +117,10 @@ async function handleCommand(cmd) {
     });
     if (copiedText.length < 1) throw new Error("nothing copied");
 
+    // TODO: refactor and test
     const quickSlotNumber = Number(cmd.split("-")[1]);
     const existingQuickSlot = Object.entries(copyFields).find(
-      ([_, val]) => val.quickSlotNumber === quickSlotNumber
+      ([_, val]) => val.quickSlotNumber === quickSlotNumber,
     );
 
     if (existingQuickSlot === undefined) {
@@ -101,6 +129,7 @@ async function handleCommand(cmd) {
         text: copiedText,
         label: `Quick slot ${quickSlotNumber}`,
         quickSlotNumber,
+        createdAt: nextCreatedAt(),
       };
     } else {
       const identifier = existingQuickSlot[0];
@@ -118,7 +147,7 @@ async function handleCommand(cmd) {
   async function paste() {
     const quickSlotNumber = Number(cmd.split("-")[1]);
     const quickSlot = Object.values(copyFields).find(
-      (val) => val.quickSlotNumber === quickSlotNumber
+      (val) => val.quickSlotNumber === quickSlotNumber,
     );
 
     if (quickSlot === undefined) throw new Error("quick slot empty");
@@ -157,10 +186,12 @@ async function handleCommand(cmd) {
   const p = copyCommands.includes(cmd)
     ? copy()
     : pasteComamnds.includes(cmd)
-    ? paste()
-    : Promise.reject(new Error("unknown command"));
+      ? paste()
+      : Promise.reject(new Error("unknown command"));
 
-  const badgeText = await p.catch((err) => {throw err});
+  const badgeText = await p.catch((err) => {
+    throw err;
+  });
   showBadgeForTab(badgeText);
 }
 
@@ -187,20 +218,25 @@ async function handleMessage(msg) {
   }
 
   /**
+   * Create/update a copy field.
    * @param {string|undefined} fieldId id of copyField to update (undefined for insert)
    * @param {string} label
    * @param {string} text
    * @returns {Promise<undefined>}
    */
   function upsert(fieldId, label, text) {
+    // TODO: extract out of closing func and test
     const effectiveFieldId = fieldId || Math.random().toString().substring(2);
-    if (copyFields[effectiveFieldId] === undefined)
+    if (copyFields[effectiveFieldId] === undefined) {
+      // ensure that new field is added to end of list by setting highest value of createdAt
       copyFields[effectiveFieldId] = {
-        createdAt: new Date().valueOf(),
+        createdAt: nextCreatedAt(),
       };
+    }
+    // when an existing field is being updated
+    // createdAt and quickSlotNumber is preserved
     copyFields[effectiveFieldId].label = label;
     copyFields[effectiveFieldId].text = text;
-    // TODO: add order
     return updateStorage();
   }
 
@@ -210,6 +246,8 @@ async function handleMessage(msg) {
    * @returns {Promise<undefined>}
    */
   function makeQuick(fieldId) {
+    // TODO: extract out of closing func and test
+
     if (copyFields[fieldId].quickSlotNumber !== undefined) {
       // remove field from quick slots
       delete copyFields[fieldId].quickSlotNumber;
@@ -217,16 +255,16 @@ async function handleMessage(msg) {
       // add field to quick slots
       const usedQuickSlots = new Set();
       Object.values(copyFields).forEach((val) => {
-        if (val.quickSlotNumber !== undefined) {
+        if (val.quickSlotNumber !== undefined)
           usedQuickSlots.add(val.quickSlotNumber);
-        }
       });
-      const nextAvailableQuickSlotNumber = [5, 4, 3, 2, 1].reduce(
+      // get the smallest number that's not present in the set of used quick slots
+      const nextAvailableQuickSlotNumber = [9, 8, 7, 6, 5, 4, 3, 2, 1].reduce(
         (acc, curVal) => {
           if (usedQuickSlots.has(curVal)) return acc;
           else return curVal;
         },
-        undefined
+        undefined,
       );
       if (nextAvailableQuickSlotNumber !== undefined) {
         copyFields[fieldId].quickSlotNumber = nextAvailableQuickSlotNumber;
@@ -235,7 +273,38 @@ async function handleMessage(msg) {
     return updateStorage();
   }
 
-  const { op, text, label, fieldId } = msg;
+  /**
+   * Updated createdAt fields of copy fields such that when sorted on createdAt
+   * the item with fieldId appears before the item with replacedId
+   * @param {string} fieldId id of field that is dragged
+   * @param {string} replacedId id of field that the aforementioned has been dragged over
+   * @returns {Promise<void>}
+   */
+  function reorderFields(fieldId, replacedId) {
+    // TODO: extract out of closing func and test
+    const temp = Object.entries(copyFields)
+      .map(([fieldId, data]) => ({ ...data, fieldId }))
+      .sort((a, b) => a.createdAt - b.createdAt);
+
+    // TODO: use single loop
+    const idxOfField = temp.findIndex((x) => x.fieldId === fieldId);
+    const idxOfReplaced = temp.findIndex((x) => x.fieldId === replacedId);
+
+    const draggedField = temp.splice(idxOfField, 1);
+    if (idxOfField < idxOfReplaced) {
+      temp.splice(idxOfReplaced - 1, 0, draggedField[0]);
+    } else {
+      temp.splice(idxOfReplaced, 0, draggedField[0]);
+    }
+
+    temp.forEach((val, idx) => {
+      copyFields[val.fieldId].createdAt = idx;
+    });
+
+    return updateStorage();
+  }
+
+  const { op, text, label, fieldId, replacedId } = msg;
 
   let p;
   if (op === messageTypes.EDIT_FROM_POPUP) {
@@ -246,6 +315,8 @@ async function handleMessage(msg) {
     p = getAll();
   } else if (op === messageTypes.MAKE_QUICK) {
     p = makeQuick(fieldId);
+  } else if (op === messageTypes.REORDER_FIELDS) {
+    p = reorderFields(fieldId, replacedId);
   } else {
     p = Promise.reject(new Error("unknown message"));
   }

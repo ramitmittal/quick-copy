@@ -8,6 +8,7 @@ const messageTypes = Object.freeze({
   PASTE_TO_PAGE: 2,
 
   // for browser action
+  REORDER_FIELDS: 3,
   REQUEST_CURRENT_COPYFIELDS: 4,
   RESPONSE_CURRENT_COPYFIELDS: 5,
   DELETE_FROM_POPUP: 6,

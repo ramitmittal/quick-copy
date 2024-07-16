@@ -16,11 +16,15 @@
           class="moz-bg-white"
         />
       </div>
-      <transition-group class="hide-scroll" name="list" tag="p">
+      <div class="hide-scroll">
         <div
           v-for="value in filteredCopyFields"
           :key="value.fieldId"
           class="flex-row"
+          draggable="true"
+          @dragstart="onDragStart($event, value)"
+          @dragover="onDragOver($event)"
+          @drop="onDrop($event, value)"
         >
           <p
             class="caption-30"
@@ -61,7 +65,7 @@
             />
           </div>
         </div>
-      </transition-group>
+      </div>
     </div>
   </div>
 </template>
@@ -79,6 +83,7 @@ export default {
     return {
       searchTerm: "",
       toasterText: "",
+      draggedItemId: "",
     };
   },
   computed: {
@@ -86,16 +91,10 @@ export default {
       return Object.keys(this.copyFields).length === 0;
     },
     filteredCopyFields() {
-      // TODO: what is this?
       const searchTerm = this.searchTerm;
       const copyFields = this.copyFields;
 
-      function sortQuickSlotsFirst(a, b) {
-        const aqsn = a.quickSlotNumber;
-        const bqsn = b.quickSlotNumber;
-        if (aqsn !== undefined && bqsn === undefined) return -1;
-        if (aqsn === undefined && bqsn !== undefined) return 1;
-        if (aqsn !== undefined && bqsn !== undefined) return aqsn - bqsn;
+      function sortOnCreatedAt(a, b) {
         return a.createdAt - b.createdAt;
       }
 
@@ -113,8 +112,8 @@ export default {
 
       const entries = Object.entries(copyFields);
       return searchTerm === ""
-        ? entries.reduce(reduceWithoutFilter, []).sort(sortQuickSlotsFirst)
-        : entries.reduce(reduceWithFilter, []).sort(sortQuickSlotsFirst);
+        ? entries.reduce(reduceWithoutFilter, []).sort(sortOnCreatedAt)
+        : entries.reduce(reduceWithFilter, []).sort(sortOnCreatedAt);
     },
   },
   methods: {
@@ -135,6 +134,21 @@ export default {
     },
     quickSlotText(n) {
       return `Quick Slot ${n}.\nClick to remove from Quick Slot.`;
+    },
+    onDragStart(event, value) {
+      this.draggedItemId = value.fieldId;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/html', event.target.outerHTML);
+    },
+    onDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    },
+    onDrop(event, value) {
+      const { fieldId: replacedId } = value;
+      event.preventDefault();
+      if (replacedId == this.draggedItemId) return;
+      this.$emit('reoder-fields', { fieldId: this.draggedItemId, replacedId });
     },
   },
 };

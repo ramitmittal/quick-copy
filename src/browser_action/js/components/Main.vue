@@ -18,6 +18,7 @@
       v-if="showListing"
       :copy-fields="copyFields"
       @edit-field="handleEditField"
+      @reoder-fields="handleReorderFields"
       @delete-field="handleDeleteField"
       @make-quick="handleMakeQuick"
     />
@@ -85,6 +86,14 @@ export default {
         .sendMessage({
           op: messageTypes.DELETE_FROM_POPUP,
           fieldId,
+        })
+        .then(this.refreshData);
+    },
+    handleReorderFields(payloadFromComponent) {
+      return browser.runtime
+        .sendMessage({
+          op: messageTypes.REORDER_FIELDS,
+          ...payloadFromComponent,
         })
         .then(this.refreshData);
     },
