@@ -281,28 +281,33 @@ async function handleMessage(msg) {
    * @returns {Promise<void>}
    */
   function reorderFields(fieldId, replacedId) {
-    // TODO: extract out of closing func and test
+    // Extract and sort the fields based on their creation time
     const temp = Object.entries(copyFields)
       .map(([fieldId, data]) => ({ ...data, fieldId }))
       .sort((a, b) => a.createdAt - b.createdAt);
-
-    // TODO: use single loop
+  
+    // Find the indices of the dragged field and the target field
     const idxOfField = temp.findIndex((x) => x.fieldId === fieldId);
     const idxOfReplaced = temp.findIndex((x) => x.fieldId === replacedId);
-
-    const draggedField = temp.splice(idxOfField, 1);
+  
+    // Remove the dragged field from its original position
+    const [draggedField] = temp.splice(idxOfField, 1);
+  
+    // Insert the dragged field at the new position
     if (idxOfField < idxOfReplaced) {
-      temp.splice(idxOfReplaced - 1, 0, draggedField[0]);
+      temp.splice(idxOfReplaced, 0, draggedField);
     } else {
-      temp.splice(idxOfReplaced, 0, draggedField[0]);
+      temp.splice(idxOfReplaced, 0, draggedField);
     }
-
+  
+    // Update the createdAt property to reflect the new order
     temp.forEach((val, idx) => {
       copyFields[val.fieldId].createdAt = idx;
     });
-
+  
     return updateStorage();
   }
+  
 
   const { op, text, label, fieldId, replacedId } = msg;
 

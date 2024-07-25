@@ -28,7 +28,7 @@
         >
           <p
             class="caption-30"
-            :title="makeString(value.text)"
+            :title="makeString('Click to Copy')"
             @click="executeCopy(value.text)"
           >
             {{ value.label }}
@@ -175,6 +175,11 @@ p {
   justify-content: space-between;
   border-radius: 0.4rem;
   align-items: baseline;
+  cursor: grab;
+}
+
+.flex-row:active {
+    cursor: grabbing;
 }
 .flex-row:hover {
   background: #ededf0;
@@ -200,7 +205,7 @@ p {
 }
 .icon {
   border-radius: 0.4rem;
-  padding: 0.2rem;
+  padding: 0.4rem;
 }
 .icon:hover {
   background: #d7d7db;
