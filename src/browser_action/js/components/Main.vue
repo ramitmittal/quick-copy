@@ -70,11 +70,16 @@ export default {
         this.refreshData();
       });
     },
-    refreshData() {
+    refreshData(retriesLeft = 2) {
       return browser.runtime
         .sendMessage({ op: messageTypes.REQUEST_CURRENT_COPYFIELDS })
         .then((response) => {
           this.copyFields = response.payload;
+        })
+        .catch((err) => {
+          console.log(`failed to refresh data: ${err}`);
+          if (retriesLeft > 0) return refreshData(retriesLeft - 1);
+          throw err;
         });
     },
     handleEditField(fieldId) {
