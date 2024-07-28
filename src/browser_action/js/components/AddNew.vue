@@ -68,6 +68,10 @@ textarea {
   padding: 0.4rem;
   width: 100%;
 }
+.moz-bg-white:focus {
+  border-color: #4A90E2; /* Highlight color when focused */
+  outline: none; /* Removes the default focus outline */
+}
 textarea {
   resize: vertical;
   font-size: 0.9rem;

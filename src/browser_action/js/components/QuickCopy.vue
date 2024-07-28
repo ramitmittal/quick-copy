@@ -21,16 +21,14 @@
           v-for="value in filteredCopyFields"
           :key="value.fieldId"
           class="flex-row"
+          :title="makeString('Click to copy, drag to reorder')"
           draggable="true"
+          @click="executeCopy(value.text)"
           @dragstart="onDragStart($event, value)"
           @dragover="onDragOver($event)"
           @drop="onDrop($event, value)"
         >
-          <p
-            class="caption-30"
-            :title="makeString('Click to Copy')"
-            @click="executeCopy(value.text)"
-          >
+          <p class="caption-30">
             {{ value.label }}
           </p>
           <div class="icons">
