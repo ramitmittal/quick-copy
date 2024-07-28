@@ -21,7 +21,7 @@
           v-for="value in filteredCopyFields"
           :key="value.fieldId"
           class="flex-row"
-          :title="makeString('Click to copy, drag to reorder')"
+          title="Click to copy, drag to reorder"
           draggable="true"
           @click="executeCopy(value.text)"
           @dragstart="onDragStart($event, value)"
@@ -37,7 +37,7 @@
               :title="quickSlotText(value.quickSlotNumber)"
               class="icon"
               src="../../static/star.svg"
-              @click="$emit('make-quick', value.fieldId)"
+              @click.stop="$emit('make-quick', value.fieldId)"
             />
             <span v-if="value.quickSlotNumber" class="number-display">
               {{ value.quickSlotNumber }}
@@ -47,19 +47,19 @@
               class="icon"
               src="../../static/star-half-alt.svg"
               title="Add to Quick Slot"
-              @click="$emit('make-quick', value.fieldId)"
+              @click.stop="$emit('make-quick', value.fieldId)"
             />
             <img
               class="icon"
               src="../../static/edit.svg"
               title="Edit"
-              @click="$emit('edit-field', value.fieldId)"
+              @click.stop="$emit('edit-field', value.fieldId)"
             />
             <img
               class="icon"
               src="../../static/trash.svg"
               title="Delete"
-              @click="$emit('delete-field', value.fieldId)"
+              @click.stop="$emit('delete-field', value.fieldId)"
             />
           </div>
         </div>
@@ -115,10 +115,6 @@ export default {
     },
   },
   methods: {
-    makeString(value) {
-      if (value.length > 200) return `${value.substring(0, 200)}...`;
-      return value;
-    },
     async executeCopy(value) {
       try {
         await navigator.clipboard.writeText(value);

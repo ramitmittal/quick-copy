@@ -69,7 +69,7 @@ textarea {
   width: 100%;
 }
 .moz-bg-white:focus {
-  border-color: #4A90E2; /* Highlight color when focused */
+  border-color: #4a90e2; /* Highlight color when focused */
   outline: none; /* Removes the default focus outline */
 }
 textarea {
