@@ -285,29 +285,28 @@ async function handleMessage(msg) {
     const temp = Object.entries(copyFields)
       .map(([fieldId, data]) => ({ ...data, fieldId }))
       .sort((a, b) => a.createdAt - b.createdAt);
-  
+
     // Find the indices of the dragged field and the target field
     const idxOfField = temp.findIndex((x) => x.fieldId === fieldId);
     const idxOfReplaced = temp.findIndex((x) => x.fieldId === replacedId);
-  
+
     // Remove the dragged field from its original position
     const [draggedField] = temp.splice(idxOfField, 1);
-  
+
     // Insert the dragged field at the new position
     if (idxOfField < idxOfReplaced) {
       temp.splice(idxOfReplaced, 0, draggedField);
     } else {
       temp.splice(idxOfReplaced, 0, draggedField);
     }
-  
+
     // Update the createdAt property to reflect the new order
     temp.forEach((val, idx) => {
       copyFields[val.fieldId].createdAt = idx;
     });
-  
+
     return updateStorage();
   }
-  
 
   const { op, text, label, fieldId, replacedId } = msg;
 

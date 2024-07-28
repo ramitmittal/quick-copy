@@ -31,14 +31,15 @@ export default {
 input:focus,
 textarea:focus,
 button:focus {
-    outline: none;
+  outline: none;
 }
-input, textarea {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    box-sizing: border-box;
+input,
+textarea {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
 }
 #app {
   width: 400px;

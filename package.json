@@ -7,7 +7,8 @@
     "dev": "./scripts/dev.sh",
     "dev:chrome": "NODE_ENV=CHROME npm run dev",
     "build": "node scripts/validate && ./scripts/build.sh",
-    "build:chrome": "NODE_ENV=CHROME npm run build"
+    "build:chrome": "NODE_ENV=CHROME npm run build",
+    "format": "prettier -w src/"
   },
   "devDependencies": {
     "@parcel/transformer-vue": "^2.4.1",

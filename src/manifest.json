@@ -9,10 +9,7 @@
     "48": "icon_48.png",
     "128": "icon_128.png"
   },
-  "permissions": [
-    "storage",
-    "clipboardRead"
-  ],
+  "permissions": ["storage", "clipboardRead"],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],

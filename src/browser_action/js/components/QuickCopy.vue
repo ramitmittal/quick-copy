@@ -137,18 +137,18 @@ export default {
     },
     onDragStart(event, value) {
       this.draggedItemId = value.fieldId;
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/html', event.target.outerHTML);
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/html", event.target.outerHTML);
     },
     onDragOver(event) {
       event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
+      event.dataTransfer.dropEffect = "move";
     },
     onDrop(event, value) {
       const { fieldId: replacedId } = value;
       event.preventDefault();
       if (replacedId == this.draggedItemId) return;
-      this.$emit('reoder-fields', { fieldId: this.draggedItemId, replacedId });
+      this.$emit("reoder-fields", { fieldId: this.draggedItemId, replacedId });
     },
   },
 };
@@ -179,7 +179,7 @@ p {
 }
 
 .flex-row:active {
-    cursor: grabbing;
+  cursor: grabbing;
 }
 .flex-row:hover {
   background: #ededf0;
