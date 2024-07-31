@@ -77,6 +77,7 @@ export default {
           this.copyFields = response.payload;
         })
         .catch((err) => {
+          // TODO: remove this retry
           console.log(`failed to refresh data: ${err}`);
           if (retriesLeft > 0) return refreshData(retriesLeft - 1);
           throw err;
