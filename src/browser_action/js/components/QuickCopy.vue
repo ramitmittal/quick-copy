@@ -195,7 +195,7 @@ p {
   cursor: pointer;
   padding: 0.4rem;
   overflow-wrap: break-word;
-  max-width: 370px;
+  max-width: 224px;
 }
 .icon {
   border-radius: 0.4rem;
