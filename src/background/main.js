@@ -42,7 +42,7 @@ async function loadData() {
   }
 }
 
-loadData();
+const loadP = loadData();
 
 /**
  * Write copy data to webextension storage and update browser_action
@@ -308,6 +308,7 @@ async function handleMessage(msg) {
     return updateStorage();
   }
 
+  await loadP;
   const { op, text, label, fieldId, replacedId } = msg;
 
   let p;
